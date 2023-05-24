@@ -1,60 +1,50 @@
-let web3;
+document.addEventListener("DOMContentLoaded", function() {
+  let web3;
 
-// Function to connect to MetaMask
-async function connectMetamask() {
-  if (window.ethereum) {
-    try {
-      await window.ethereum.enable();
+  // Function to connect to Metamask
+  async function connectToMetamask() {
+    if (window.ethereum) {
       web3 = new Web3(window.ethereum);
-      alert('Connected to MetaMask!');
-    } catch (error) {
-      alert('Error connecting to MetaMask:', error);
-    }
-  } else {
-    alert('MetaMask not found!');
-  }
-}
-
-// Function to connect to Trust Wallet
-async function connectTrustWallet() {
-  if (window.ethereum) {
-    try {
-      web3 = new Web3(window.ethereum);
-      alert('Connected to Trust Wallet!');
-    } catch (error) {
-      alert('Error connecting to Trust Wallet:', error);
-    }
-  } else {
-    alert('Trust Wallet not found!');
-  }
-}
-
-// Function to import token address to wallet
-function importTokenAddress() {
-  const tokenAddress = document.getElementById('tokenAddressInput').value;
-  if (web3 && web3.currentProvider.isMetaMask) {
-    web3.currentProvider.sendAsync(
-      {
-        method: 'wallet_watchAsset',
-        params: {
-          type: 'ERC20',
-          options: {
-            address: tokenAddress,
-            symbol: 'TOKEN',
-            decimals: 18,
-            image: 'https://example.com/token-image.png',
-          },
-        },
-      },
-      (err, added) => {
-        if (added) {
-          alert('Token added to MetaMask!');
-        } else {
-          alert('Error adding token:', err);
-        }
+      try {
+        // Request access to the user's MetaMask account
+        await window.ethereum.enable();
+        console.log("Connected to Metamask");
+        // Enable other functionality or display account information
+      } catch (error) {
+        console.error("Failed to connect to Metamask", error);
       }
-    );
-  } else {
-    alert('Web3 provider not available!');
+    } else {
+      console.error("Metamask is not available");
+    }
   }
-}
+
+  // Function to import First Place token
+  async function importFirstPlaceToken() {
+    if (!web3) {
+      console.error("Not connected to Metamask");
+      return;
+    }
+
+    const tokenAddress = "0x69D7F6880aeDCDD4b98D71e9008B310B0DfE4aa9";
+
+    try {
+      // Use web3 to interact with the Ethereum network
+      const accounts = await web3.eth.getAccounts();
+      const tokenContract = new web3.eth.Contract(abi, tokenAddress);
+      const tokenName = await tokenContract.methods.name().call();
+
+      console.log(`Imported token: ${tokenName}`);
+      // Perform further actions with the imported token
+    } catch (error) {
+      console.error("Failed to import token", error);
+    }
+  }
+
+  // Event listener for the "Connect to Metamask" button
+  const connectButton = document.getElementById("connectButton");
+  connectButton.addEventListener("click", connectToMetamask);
+
+  // Event listener for the "Import First Place Token" button
+  const importTokenButton = document.getElementById("importTokenButton");
+  importTokenButton.addEventListener("click", importFirstPlaceToken);
+});
