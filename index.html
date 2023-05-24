@@ -1,47 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>First Place</title>
+  <meta charset="UTF-8">
+  <title>Web3 Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #walletStatus {
+      margin-bottom: 20px;
+    }
+
+    #walletAddress {
+      font-weight: bold;
+    }
+
+    #swapButton {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to First Place</h1>
+  <h1>Web3 Website</h1>
 
-    <div id="contract-info">
-        <h2>Contract Information</h2>
-        <p>Contract Address: 0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9</p>
-        <!-- Add more contract information here -->
-    </div>
+  <div id="walletStatus">
+    <p>Wallet Status:</p>
+    <p id="walletAddress"></p>
+  </div>
 
-    <div id="external-links">
-        <h2>External Links</h2>
-        <ul>
-            <li><a href="https://recentcoin.com/token/first-place-1st-0x69d7f688#wallets" target="_blank">RecentCoin</a></li>
-            <li><a href="https://quickswap.exchange/#/swap?outputCurrency=0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9" target="_blank">QuickSwap</a></li>
-            <li><a href="https://polygon.poocoin.app/tokens/0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9" target="_blank">Polygon Poocoin</a></li>
-        </ul>
-    </div>
+  <a href="https://quickswap.exchange/#/swap?outputCurrency=0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9">
+    Go to QuickSwap
+  </a>
 
-    <div id="metamask-connection">
-        <h2>Connect with MetaMask</h2>
-        <button onclick="connectMetamask()">Connect</button>
-    </div>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.4.0/dist/web3-provider.min.js"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js" type="text/javascript"></script>
+  <script>
+    // Contract address
+    const contractAddress = "0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9";
 
-    <!-- Include the MetaMask JavaScript library -->
-    <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider/dist/detect-provider.min.js"></script>
-    <script>
-        // Function to connect with MetaMask
-        function connectMetamask() {
-            ethereum.request({ method: 'eth_requestAccounts' })
-            .then((accounts) => {
-                const address = accounts[0];
-                alert('Connected with MetaMask! Address: ' + address);
-                // You can perform additional actions with the connected address here
-            })
-            .catch((error) => {
-                console.error(error);
-                alert('Failed to connect with MetaMask');
-            });
-        }
-    </script>
+    // Initialize Web3
+    async function initWeb3() {
+      if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+        await ethereum.enable();
+      } else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider);
+      } else {
+        console.log("Non-Ethereum browser detected. You should consider trying MetaMask!");
+      }
+    }
+
+    // Get and display the connected wallet address
+    async function displayWalletAddress() {
+      const accounts = await web3.eth.getAccounts();
+      const walletAddress = accounts[0];
+      document.getElementById("walletAddress").textContent = walletAddress;
+    }
+
+    // Connect to MetaMask
+    async function connectToWallet() {
+      try {
+        await initWeb3();
+        await displayWalletAddress();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Initiate swap or buy on QuickSwap
+    function initiateSwap() {
+      window.open("https://quickswap.exchange/#/swap?outputCurrency=0x69d7f6880aedcdd4b98d71e9008b310b0dfe4aa9", "_blank");
+    }
+
+    // Event listener for connect button
+    document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById("swapButton").addEventListener("click", initiateSwap);
+    });
+
+    // Connect to wallet on page load
+    window.addEventListener("load", function() {
+      connectToWallet();
+    });
+  </script>
+  
+  <button id="swapButton">Swap or Buy</button>
 </body>
 </html>
