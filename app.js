@@ -1,49 +1,60 @@
-const contractAddress = '0x69D7F6880aeDCDD4b98D71e9008B310B0DfE4aa9';
+let web3;
 
-async function connect() {
+// Function to connect to MetaMask
+async function connectMetamask() {
   if (window.ethereum) {
     try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      setStatus('Connected to Web3');
+      await window.ethereum.enable();
+      web3 = new Web3(window.ethereum);
+      alert('Connected to MetaMask!');
     } catch (error) {
-      setStatus('Web3 connection error');
-      console.error(error);
+      alert('Error connecting to MetaMask:', error);
     }
   } else {
-    setStatus('Web3 not detected');
+    alert('MetaMask not found!');
   }
 }
 
-async function importToken() {
-  const tokenAddressInput = document.getElementById('token-address-input');
-  const tokenAddress = tokenAddressInput.value;
-
-  if (!window.ethereum) {
-    setStatus('Web3 not detected');
-    return;
+// Function to connect to Trust Wallet
+async function connectTrustWallet() {
+  if (window.ethereum) {
+    try {
+      web3 = new Web3(window.ethereum);
+      alert('Connected to Trust Wallet!');
+    } catch (error) {
+      alert('Error connecting to Trust Wallet:', error);
+    }
+  } else {
+    alert('Trust Wallet not found!');
   }
+}
 
-  try {
-    await window.ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: tokenAddress,
-          symbol: 'TOKEN',
-          decimals: 18,
-          image: 'https://example.com/token.png',
+// Function to import token address to wallet
+function importTokenAddress() {
+  const tokenAddress = document.getElementById('tokenAddressInput').value;
+  if (web3 && web3.currentProvider.isMetaMask) {
+    web3.currentProvider.sendAsync(
+      {
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: tokenAddress,
+            symbol: 'TOKEN',
+            decimals: 18,
+            image: 'https://example.com/token-image.png',
+          },
         },
       },
-    });
-    setStatus('Token imported successfully');
-  } catch (error) {
-    setStatus('Token import error');
-    console.error(error);
+      (err, added) => {
+        if (added) {
+          alert('Token added to MetaMask!');
+        } else {
+          alert('Error adding token:', err);
+        }
+      }
+    );
+  } else {
+    alert('Web3 provider not available!');
   }
-}
-
-function setStatus(message) {
-  const statusElement = document.getElementById('status');
-  statusElement.innerHTML = message;
 }
